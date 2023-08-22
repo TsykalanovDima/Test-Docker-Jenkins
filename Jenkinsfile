@@ -33,7 +33,7 @@ pipeline {
             emailext attachLog: true,
                     subject: "Test Results",
                     body: "Find the attached test results and Allure report.",
-                    attachmentsPattern: '/Users/dimatsy/PycharmProjects/pythonProject5/Test_0/allure-report/**',
+                    attachmentsPattern: '**/allure-report/**',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider']],
                     to: 'tsykalanovdima@gmail.com' // Ваша электронная почта
         }
