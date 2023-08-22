@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git']]])
             }
         }
         
@@ -33,7 +33,9 @@ pipeline {
             emailext attachLog: true,
                     subject: "Test Results",
                     body: "Find the attached test results and Allure report.",
-                    attachmentsPattern: '/Users/dimatsy/PycharmProjects/pythonProject5/Test_0/allure-report/**'
+                    attachmentsPattern: '/Users/dimatsy/PycharmProjects/pythonProject5/Test_0/allure-report/**',
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider']],
+                    to: 'tsykalanovdima@gmail.com' // Ваша электронная почта
         }
     }
 }
