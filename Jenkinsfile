@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def creds = credentials('github-token')
+                    def creds = credentials('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')
                     checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git']], branches: [[name: '*/master']], extensions: [[$class: 'GitLFSPull']], userRemoteConfigs: [[credentialsId: creds.id]]])
                 }
             }
