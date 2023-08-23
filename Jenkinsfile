@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     def creds = credentials('github-credentials')
-                    checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git', credentialsId: creds.id]], branches: [[name: '*/main']]])
+                    checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'git@github.com:TsykalanovDima/Test_0.git', credentialsId: creds.id]], branches: [[name: '*/main']]])
                 }
             }
         }
