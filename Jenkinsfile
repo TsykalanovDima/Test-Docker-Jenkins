@@ -4,15 +4,18 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git']]])
+                script {
+                    def creds = credentials('github-token')
+                    checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git']], branches: [[name: '*/master']], extensions: [[$class: 'GitLFSPull']], userRemoteConfigs: [[credentialsId: creds.id]]])
+                }
             }
         }
         
         stage('Build and Test in Container') {
             steps {
                 script {
-                    docker.build("my-test-container")
-                    docker.image("my-test-container").withRun("-v /Users/dimatsy/PycharmProjects/pythonProject5/Test_0:/app") {
+                    docker.image("python:3.9").inside("-v ${PWD}:/app") {
+                        sh "pip install -r requirements.txt"
                         sh "pytest Test_0.py --alluredir=./allure-results"
                     }
                 }
@@ -21,21 +24,8 @@ pipeline {
         
         stage('Generate Allure Report') {
             steps {
-                script {
-                    sh "allure generate /app/allure-results --clean -o /Users/dimatsy/PycharmProjects/pythonProject5/Test_0/allure-report"
-                }
+                sh "allure generate ./allure-results --clean -o ./allure-report"
             }
-        }
-    }
-    
-    post {
-        always {
-            emailext attachLog: true,
-                    subject: "Test Results",
-                    body: "Find the attached test results and Allure report.",
-                    attachmentsPattern: '**/allure-report/**',
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider']],
-                    to: 'tsykalanovdima@gmail.com' // Ваша электронная почта
         }
     }
 }
