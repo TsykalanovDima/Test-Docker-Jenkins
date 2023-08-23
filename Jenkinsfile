@@ -1,12 +1,16 @@
 pipeline {
     agent any
     
+    environment {
+        DOCKER_IMAGE = 'my-test-container'
+    }
+    
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    def creds = credentials('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')
-                    checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git']], branches: [[name: '*/master']], extensions: [[$class: 'GitLFSPull']], userRemoteConfigs: [[credentialsId: creds.id]]])
+                    def creds = credentials('github-credentials')
+                    checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'https://github.com/TsykalanovDima/Test_0.git', credentialsId: creds.id]], branches: [[name: '*/main']]])
                 }
             }
         }
@@ -14,9 +18,9 @@ pipeline {
         stage('Build and Test in Container') {
             steps {
                 script {
-                    docker.image("python:3.9").inside("-v ${PWD}:/app") {
-                        sh "pip install -r requirements.txt"
-                        sh "pytest Test_0.py --alluredir=./allure-results"
+                    docker.build(DOCKER_IMAGE)
+                    docker.image(DOCKER_IMAGE).withRun('-v /Users/dimatsy/PycharmProjects/pythonProject5/Test_0:/app') {
+                        sh "pytest"
                     }
                 }
             }
@@ -24,7 +28,9 @@ pipeline {
         
         stage('Generate Allure Report') {
             steps {
-                sh "allure generate ./allure-results --clean -o ./allure-report"
+                script {
+                    sh "docker run --rm -v /Users/dimatsy/PycharmProjects/pythonProject5/Test_0:/app ${DOCKER_IMAGE} allure generate /app/allure-results --clean -o /app/allure-report"
+                }
             }
         }
     }
