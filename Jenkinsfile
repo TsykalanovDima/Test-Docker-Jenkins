@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     // Сборка Docker-образа
-                    def dockerImage = docker.build('dima_1')
+                    def dockerImage = docker.build('dima_1', '.')
                 }
             }
         }
@@ -14,7 +14,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Запуск тестов внутри контейнера
-                sh 'docker run -it --rm dima_1'
+                script {
+                    sh "docker run -it --rm dima_1 python3 Test_0.py"
+                }
             }
         }
     }
