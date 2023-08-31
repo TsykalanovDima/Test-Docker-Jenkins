@@ -2,25 +2,31 @@ pipeline {
     agent any
     
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                // Выполнить проверку кода из репозитория
                 checkout scm
             }
         }
-        stage('Build') {
+        
+        stage('Build and Test') {
             steps {
-                // Сборка Docker-образа
-                sh 'docker build -t dima_1 .'
+                script {
+                    docker.build("dima_1")
+                    def container = docker.image("dima_1").run("-v /app/Test_0.py:/app/Test_0.py dima_1")
+                    try {
+                        sh 'pytest -s /app/Test_0.py'
+                    } finally {
+                        container.stop()
+                    }
+                }
             }
         }
-        stage('Run Tests') {
+        
+        stage('Generate and Display Allure Report') {
             steps {
-                // Запуск тестов внутри контейнера
                 script {
-                    docker.image('dima_1:latest').inside {
-                        sh 'pytest -s /app/Test_0.py'
-                    }
+                    sh 'allure generate -c /var/jenkins_home/workspace/Pros/allure-results -o /var/jenkins_home/workspace/Pros/allure-report'
+                    sh 'allure open /var/jenkins_home/workspace/Pros/allure-report'
                 }
             }
         }
