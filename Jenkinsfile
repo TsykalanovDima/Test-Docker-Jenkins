@@ -18,7 +18,7 @@ pipeline {
                     docker.image('dima_1:latest').inside('--privileged') {
                         sh 'pytest -s /app/Test_0.py'
                         
-                        // Установка Allure
+                        // Установка Allure в контейнере
                         sh 'apt-get update && apt-get install -y allure'
                         
                         // Генерация и открытие отчетов Allure
