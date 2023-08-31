@@ -22,12 +22,11 @@ pipeline {
             }
         }
         stage('Generate Allure Report') {
-            steps {
-                script {
-                    sh 'curl -o allure-2.14.0.tgz -Ls https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.tgz'
-                    sh 'tar -zxvf allure-2.14.0.tgz -C /opt/'
-                    sh 'allure generate /app/Test_0/allure-results -o /app/Test_0/allure-report --clean'
-                }
+            script {
+                sh 'docker run --rm -v /app/Test_0/allure-results:/allure-results -v /app/Test_0/allure-report:/allure-report allure-framework/allure-docker:latest generate /allure-results -o /allure-report --clean'
+            }
+
+
             }
         }
         stage('Publish Allure Report') {
