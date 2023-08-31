@@ -4,35 +4,22 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Выполнить проверку кода из репозитория
                 checkout scm
             }
         }
-        
         stage('Build') {
             steps {
+                // Сборка Docker-образа
                 sh 'docker build -t dima_1 .'
             }
         }
-        
-        stage('Run Tests and Generate Allure Report') {
+        stage('Run Tests') {
             steps {
+                // Запуск тестов внутри контейнера
                 script {
-                    def containerId = sh(script: "docker run -d dima_1:latest", returnStdout: true).trim()
-                    try {
-                        sh "docker exec ${containerId} pytest -s /app/Test_0.py"
-                        
-                        sh "docker exec ${containerId} allure generate /app/Test_0/allure-results -o /app/Test_0/allure-report --clean"
-                        
-                        publishHTML([
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: true,
-                            keepAll: true,
-                            reportDir: '/app/Test_0/allure-report',
-                            reportFiles: 'index.html',
-                            reportName: 'Allure Report'
-                        ])
-                    } finally {
-                        sh "docker stop ${containerId}"
+                    docker.image('dima_1:latest').inside {
+                        sh 'pytest -s /app/Test_0.py'
                     }
                 }
             }
