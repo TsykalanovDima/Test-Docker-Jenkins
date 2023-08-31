@@ -18,8 +18,10 @@ pipeline {
                     docker.image('dima_1:latest').inside('--privileged') {
                         sh 'pytest -s /app/Test_0.py'
                         
-                        // Установка Allure и генерация отчетов
+                        // Установка Allure
                         sh 'apt-get update && apt-get install -y allure'
+                        
+                        // Генерация и открытие отчетов Allure
                         sh 'allure generate /app/allure-results -o /app/allure-report --clean'
                         sh 'allure open /app/allure-report'
                     }
