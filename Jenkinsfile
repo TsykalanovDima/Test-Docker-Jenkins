@@ -4,27 +4,22 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Выполнить проверку кода из репозитория
                 checkout scm
             }
         }
         stage('Build') {
             steps {
+                // Сборка Docker-образа
                 sh 'docker build -t dima_1 .'
             }
         }
         stage('Run Tests') {
             steps {
+                // Запуск тестов внутри контейнера
                 script {
-                    def allurePath = sh(script: 'which allure', returnStdout: true).trim()
-                    
-                    docker.image('dima_1:latest').inside('--privileged') {
+                    docker.image('dima_1:latest').inside {
                         sh 'pytest -s /app/Test_0.py'
-                        
-                        sh 'apt-get update && apt-get install -y allure'
-                        
-                        // Генерация и открытие отчетов Allure с использованием полного пути
-                        sh "${allurePath} generate /app/allure-results -o /app/allure-report --clean"
-                        sh "${allurePath} open /app/allure-report"
                     }
                 }
             }
