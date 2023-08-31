@@ -22,11 +22,10 @@ pipeline {
             }
         }
         stage('Generate Allure Report') {
-            script {
-                sh 'docker run --rm -v /app/Test_0/allure-results:/allure-results -v /app/Test_0/allure-report:/allure-report allure-framework/allure-docker:latest generate /allure-results -o /allure-report --clean'
-            }
-
-
+            steps {
+                script {
+                    sh 'docker run --rm -v /app/Test_0/allure-results:/allure-results -v /app/Test_0/allure-report:/allure-report allure-framework/allure-docker:latest generate /allure-results -o /allure-report --clean'
+                }
             }
         }
         stage('Publish Allure Report') {
