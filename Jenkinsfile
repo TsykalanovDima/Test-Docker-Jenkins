@@ -4,21 +4,24 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Выполнить проверку кода из репозитория
                 checkout scm
             }
         }
-        
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
-                script {
-                    def dockerImage = docker.build('dima_1')
-                }
+                // Сборка Docker-образа
+                sh 'docker build -t dima_1 .'
             }
         }
-        
         stage('Run Tests') {
             steps {
-                sh 'docker run -it --rm dima_1 pytest -s /app/Test_0.py'
+                // Запуск тестов внутри контейнера
+                script {
+                    docker.image('dima_1:latest').inside {
+                        sh 'pytest -s /app/Test_0.py'
+                    }
+                }
             }
         }
     }
