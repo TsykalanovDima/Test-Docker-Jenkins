@@ -30,5 +30,16 @@ pipeline {
                 sh 'allure generate /app/allure-results -o /app/allure-report --clean'
             }
         }
+        stage('Send Email') {
+            steps {
+                script {
+                    emailext body: '''<html><body>Здесь может быть текст вашего письма с ссылкой на Allure отчет.</body></html>''',
+                        subject: 'Отчет Allure',
+                        mimeType: 'text/html',
+                        to: 'tsykalanovdima@gmail.com',
+                        attachmentsPattern: '**/allure-report/*'
+                }
+            }
+        }
     }
 }
