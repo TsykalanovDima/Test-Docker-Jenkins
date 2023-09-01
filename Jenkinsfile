@@ -24,6 +24,26 @@ pipeline {
                 }
             }
         }
+        stage('Generate Allure Report') {
+            steps {
+                script {
+                    sh 'allure generate /app/allure-results -o /app/allure-report --clean'
+                    archiveArtifacts allowEmptyArchive: true, artifacts: 'allure-report/**'
+                }
+            }
+        }
+        stage('View Allure Report') {
+            steps {
+                script {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'allure-results']]
+                    ])
+                }
+            }
+        }
     }
 }
- 
